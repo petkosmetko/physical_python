@@ -1,61 +1,58 @@
-# pico_ap_led.py
+# This file is executed on every boot (including wake-boot from deepsleep)
+#import esp
+#esp.osdebug(None)
+#import webrepl
+#webrepl.start()
+
+# esp32_sta_button.py
 import network
 import socket
-from machine import Pin, PWM
-from time import sleep
+import time
+from machine import Pin
 
+# Wi-Fi credentials (connect to Pico W AP)
+ssid = 'PICO_LED_AP'
+password = '12345678'
 
+sta = network.WLAN(network.STA_IF)
+sta.active(True)
+sta.connect(ssid, password)
 
-servo = PWM(Pin(0))
-servo.freq(50)
+while not sta.isconnected():
+    print("Connecting...")
+    time.sleep(1)
+print("Connected to Pico W:", sta.ifconfig())
 
-
-def set_servo_ms(ms):
-    duty = int((ms / 20.0) * 65535)
-    servo.duty_u16(duty)
-
-# -------- Controls --------
-
-def stop():
-    set_servo_ms(1.5)   # 1.5 ms → stop
-
-def full_speed_cw():
-    set_servo_ms(2.0)   # 2.0 ms → CW max
-
-def full_speed_ccw():
-    set_servo_ms(1.0)   # 1.0 ms → CCW max
-
-def slow_cw():
-    set_servo_ms(1.7)   # Slightly above 1.5 ms
-
-def slow_ccw():
-    set_servo_ms(1.3)   # Slightly below 1.5 ms
-
-
-
-led = machine.Pin("LED", machine.Pin.OUT)
-
-# Start wifi Access Point
-ap = network.WLAN(network.AP_IF)
-ap.config(essid='PICO_LED_AP', password='12345678')
-ap.active(True)
-print('Access Point active, IP:', ap.ifconfig()[0])
-
-# UDP setup
+# UDP socket
 udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-udp.bind(('0.0.0.0', 5005))
-print("Listening for button packets...")
+pico_ip = '192.168.4.1'   # default AP IP
+port = 5005
 
+button1 = Pin(16, Pin.IN, Pin.PULL_UP)
+button2 = Pin(17, Pin.IN, Pin.PULL_UP)
+
+# Main loop
+last_state1 = 1
+last_state2 = 1
 while True:
-    data, addr = udp.recvfrom(1024)
-    msg = data.decode().strip()
-    print("Received:", msg)
-
-    if msg == "01":
-        slow_cw()
-    if msg == "00":
-        stop(1)
-    if msg == "11":
-        slow_ccw()
-    elif msg == "10":
-        stop()
+    state1 = button1.value()
+    if state1 != last_state1:
+        if state1 == 0:  # button pressed
+            udp.sendto(b"01", (pico_ip, port))
+            print("Button pressed → LED ON")
+        else:            # button released
+            udp.sendto(b"00", (pico_ip, port))
+            print("Button released → LED OFF")
+        last_state1 = state1
+    
+    state2 = button2.value()
+    if state2 != last_state2:
+        if state2 == 0:  # button pressed
+            udp.sendto(b"11", (pico_ip, port))
+            print("Button pressed → LED ON")
+        else:            # button released
+            udp.sendto(b"10", (pico_ip, port))
+            print("Button released → LED OFF")
+        last_state2 = state2
+        
+    time.sleep(0.05)
