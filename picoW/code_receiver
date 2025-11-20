@@ -1,0 +1,63 @@
+# pico_ap_led.py
+import network
+import socket
+from machine import Pin, PWM
+from time import sleep
+
+
+
+servo = PWM(Pin(0))
+servo.freq(50)
+
+
+def set_servo_ms(ms):
+    duty = int((ms / 20.0) * 65535)
+    servo.duty_u16(duty)
+
+# -------- Controls --------
+
+def stop():
+    set_servo_ms(1.5)   # 1.5 ms → stop
+
+def full_speed_cw():
+    set_servo_ms(2.0)   # 2.0 ms → CW max
+
+def full_speed_ccw():
+    set_servo_ms(1.0)   # 1.0 ms → CCW max
+
+def slow_cw():
+    set_servo_ms(1.7)   # Slightly above 1.5 ms
+
+def slow_ccw():
+    set_servo_ms(1.3)   # Slightly below 1.5 ms
+
+
+
+led = machine.Pin("LED", machine.Pin.OUT)
+
+# Start wifi Access Point
+ap = network.WLAN(network.AP_IF)
+ap.config(essid='PICO_LED_AP', password='12345678')
+ap.active(True)
+print('Access Point active, IP:', ap.ifconfig()[0])
+
+# UDP setup
+udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+udp.bind(('0.0.0.0', 5005))
+print("Listening for button packets...")
+
+while True:
+    data, addr = udp.recvfrom(1024)
+    msg = data.decode().strip()
+    print("Received:", msg)
+
+    if msg == "01":
+        slow_cw()
+    if msg == "00":
+        stop(1)
+    if msg == "11":
+        slow_ccw()
+    elif msg == "10":
+        stop()
+        
+
