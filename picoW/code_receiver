@@ -2,8 +2,9 @@
 import network
 import socket
 from machine import Pin, PWM
-from time import sleep
+import time
 
+led_pin = machine.Pin("LED",machine.Pin.OUT)
 
 
 servo = PWM(Pin(0))
@@ -43,6 +44,13 @@ print('Access Point active, IP:', ap.ifconfig()[0])
 # UDP setup
 udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 udp.bind(('0.0.0.0', 5005))
+led_pin.value(1)
+time.sleep(0.5)
+led_pin.value(0)
+time.sleep(0.3)
+led_pin.value(1)
+time.sleep(0.5)
+led_pin.value(0)
 print("Listening for button packets...")
 
 while True:
@@ -53,7 +61,7 @@ while True:
     if msg == "OI":
         slow_cw()
     elif msg == "OO":
-        stop(1)
+        stop()
     if msg == "II":
         slow_ccw()
     elif msg == "IO":
