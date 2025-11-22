@@ -48,10 +48,10 @@ while True:
     state2 = button2.value()
     if state2 != last_state2:
         if state2 == 0:  # button pressed
-            udp.sendto(b"IO", (pico_ip, port))
+            udp.sendto(b"II", (pico_ip, port))
             print("Button pressed → LED ON")
         else:            # button released
-            udp.sendto(b"II", (pico_ip, port))
+            udp.sendto(b"IO", (pico_ip, port))
             print("Button released → LED OFF")
         last_state2 = state2
         
