@@ -4,7 +4,7 @@ import socket
 from machine import Pin, PWM
 import time
 
-led_pin = machine.Pin("LED",machine.Pin.OUT)
+led_onboard = machine.Pin("LED",machine.Pin.OUT)
 
 
 servo1 = PWM(Pin(0))
@@ -36,8 +36,27 @@ def slow_ccw(serv):
     set_servo_ms(serv,1.3)   # Slightly below 1.5 ms
 
 
+def raketovy_pohon1():
+    full_speed_ccw(servo1)
 
+def raketovy_pohon2():
+    full_speed_ccw(servo2)
+    
+def raketovy_reverse1():
+    full_speed_cw(servo1)
 
+def raketovy_reverse2():
+    full_speed_cw(servo2)
+
+def stop1():
+    stop(servo1)
+
+def stop2():
+    stop(servo2)
+
+'''
+
+'''
 # Start wifi Access Point
 ap = network.WLAN(network.AP_IF)
 ap.config(essid='PICO_LED_AP', password='12345678')
@@ -47,13 +66,11 @@ print('Access Point active, IP:', ap.ifconfig()[0])
 # UDP setup
 udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 udp.bind(('0.0.0.0', 5005))
-led_pin.value(1)
-time.sleep(0.5)
-led_pin.value(0)
-time.sleep(0.3)
-led_pin.value(1)
-time.sleep(0.5)
-led_pin.value(0)
+for i in range(5):   
+    led_onboard.toggle()
+    time.sleep(0.2)
+    led_onboard.toggle()
+    time.sleep(0.2)
 print("Listening for button packets...")
 
 while True:
@@ -62,12 +79,22 @@ while True:
     print("Received:", msg)
 
     if msg == "OI":
-        slow_cw(servo1)
+        raketovy_pohon1()
     elif msg == "OO":
-        stop(servo1)
+        stop1()
     if msg == "II":
-        slow_ccw(servo2)
+        raketovy_reverse1()
     elif msg == "IO":
-        stop(servo2)
+        stop1()
+
+    if msg == "BOI":
+        raketovy_pohon2()
+    elif msg == "BOO":
+        stop2()
+    if msg == "BII":
+        raketovy_reverse2()
+    elif msg == "BIO":
+        stop2()
         
+
 
