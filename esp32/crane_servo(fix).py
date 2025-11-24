@@ -41,6 +41,7 @@ button2 = Pin(17, Pin.IN, Pin.PULL_UP)
 button3 = Pin(22, Pin.IN, Pin.PULL_UP)
 button4 = Pin(23, Pin.IN, Pin.PULL_UP)
 
+
 # Main loop
 last_state1 = 1
 last_state2 = 1
@@ -70,21 +71,24 @@ while True:
     state3 = button3.value()
     if state3 != last_state3:
         if state3 == 0:  # button pressed
-            udp.sendto(b"II", (pico_ip, port))
+            udp.sendto(b"BOI", (pico_ip, port))
             print("Button pressed → LED ON")
         else:            # button released
-            udp.sendto(b"IO", (pico_ip, port))
+            udp.sendto(b"BOO", (pico_ip, port))
             print("Button released → LED OFF")
         last_state3 = state3
         
     state4 = button4.value()
     if state4 != last_state4:
         if state4 == 0:  # button pressed
-            udp.sendto(b"II", (pico_ip, port))
+            udp.sendto(b"BII", (pico_ip, port))
             print("Button pressed → LED ON")
         else:            # button released
-            udp.sendto(b"IO", (pico_ip, port))
+            udp.sendto(b"BIO", (pico_ip, port))
             print("Button released → LED OFF")
         last_state4 = state4
         
+
+    
     time.sleep(0.05)
+
