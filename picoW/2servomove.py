@@ -9,9 +9,11 @@ led_onboard = machine.Pin("LED",machine.Pin.OUT)
 
 servo1 = PWM(Pin(0))
 servo2 = PWM(Pin(1))
+servo3 = PWM(Pin(2))
 
 servo1.freq(50)
 servo2.freq(50)
+servo3.freq(50)
 
 
 def set_servo_ms(servo, ms):
@@ -41,18 +43,27 @@ def raketovy_pohon1():
 
 def raketovy_pohon2():
     full_speed_ccw(servo2)
-    
+
+def raketovy_pohon3():
+    full_speed_ccw(servo3)    
+
 def raketovy_reverse1():
     full_speed_cw(servo1)
 
 def raketovy_reverse2():
     full_speed_cw(servo2)
 
+def raketovy_reverse3():
+    full_speed_cw(servo3)
+
 def stop1():
     stop(servo1)
 
 def stop2():
     stop(servo2)
+
+def stop3():
+    stop(servo3)
 
 '''
 
@@ -95,6 +106,15 @@ while True:
         raketovy_reverse2()
     elif msg == "BIO":
         stop2()
+
+    if msg == "COI":
+        raketovy_pohon3()
+    elif msg == "COO":
+        stop3()
+    if msg == "CII":
+        raketovy_reverse3()
+    elif msg == "CIO":
+        stop3()
         
 
 
