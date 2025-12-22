@@ -5,15 +5,15 @@ RED = 0
 GREEN = 1
 BLUE = 2
 
-adcpin1 = 26
-adcpin2 = 27
-adcpin3 = 28
+adcpin1 = 0
+adcpin2 = 1
+adcpin3 = 2
 
 pot1 = ADC(adcpin1)
 pot2 = ADC(adcpin2)
 pot3 = ADC(adcpin3)
 
-pwm_pins = [13,14,15]
+pwm_pins = [5,6,7]
 
 pwms = [PWM(Pin(pwm_pins[RED])),
         PWM(Pin(pwm_pins[GREEN])),
@@ -21,21 +21,18 @@ pwms = [PWM(Pin(pwm_pins[RED])),
         ]
 [pwm.freq(1000) for pwm in pwms]
 def ReadPotentiometer1():
-    adcpin = 26
     pot = ADC(adcpin1)
     
     adc_value1 = pot.read_u16()
     return adc_value1
 
 def ReadPotentiometer2():
-    adcpin = 27
     pot = ADC(adcpin2)
     
     adc_value2 = pot.read_u16()
     return adc_value2
 
 def ReadPotentiometer3():
-    adcpin = 28
     pot = ADC(adcpin3)
     
     adc_value3 = pot.read_u16()
