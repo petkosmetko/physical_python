@@ -18,7 +18,7 @@ def set_servo_ms(servo, ms):
     duty = int((ms / 20.0) * 65535)
     servo.duty_u16(duty)
 
-# -------- Controls --------
+# -------- Controls ---------
 
 def stop(serv):
     set_servo_ms(serv,1.5)   # 1.5 ms → stop
