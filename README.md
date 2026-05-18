@@ -1,2 +1,2 @@
 # ked sa dedko smeje babka lezie
-male koniky lubi boh
+male koniky lubi bohh
